@@ -85,7 +85,7 @@ class PhoneBook{
 
 void clearScreen() {
     for (int i = 0; i < 100; i++) {
-        cout << "\n"; // Print 100 newlines
+        cout << "\n"; // Asalnya memakai ANSI escape, tetapi ternyata tidak universal, jadinya memakai new line saja
 }
 }
 
