@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
-#include <chrono> 
-#include <thread>
+#include <algorithm> // Untuk fungsi swap jika kontak sudah melebihi 8 slot, harusnya bisa pakai define operator= untuk ngeswap , tapi biar cepat saja
 using namespace std;
+
 
 class Contact{
     //Informasi yang ada dalam kontak
@@ -11,6 +11,13 @@ class Contact{
     string tempat;
     string alamat;
     string kekuatan;
+
+    void swapper(Contact& other) {
+        swap(nama, other.nama);
+        swap(tempat, other.tempat);
+        swap(alamat, other.alamat);
+        swap(kekuatan, other.kekuatan);
+    }
 
     //Menampilkan informasi
     void detail() {
@@ -30,9 +37,12 @@ class PhoneBook{
 
     public:
 
-    PhoneBook() : count(0), terlama(0) {} // setup, semua 0
+    PhoneBook() : count(0) {} // setup, semua 0
+
+    
 
     void ADD(const string& nama, const string& tempat, const string& alamat, const string& kekuatan) {
+
         if (count < 8) {
             //Jika masih ada slot buat kontak
             contacts[count].nama = nama;
@@ -43,19 +53,29 @@ class PhoneBook{
             //tambah berapa kontak yang ada sekarang
         }
         else {
+            //Swap kontak agar kontak lama naik keatas semua
+            for (int i=0; i<7; i++){
+                contacts[i].swapper(contacts[i+1]);
+            }
+
+            //Tambahkan kontak baru ke slot terakhir
+            contacts[7].nama = nama;
+            contacts[7].tempat = tempat;
+            contacts[7].alamat = alamat;
+            contacts[7].kekuatan = kekuatan;
             //Kalau slotnya udah penuh, replace data lama, var terlama pindah ke indeks terlama selanjutnya.
-            contacts[terlama].nama = nama;
+            /*contacts[terlama].nama = nama;
             contacts[terlama].tempat = tempat;
             contacts[terlama].alamat = alamat;
             contacts[terlama].kekuatan = kekuatan;
-            terlama = (terlama+1) % 8 ;// %8 biar pas terlamanya di indeks terakhir, selanjutnya balik lagi ke 0 karena 8%8 = 0
+            terlama = (terlama+1) % 8 ;// %8 biar pas terlamanya di indeks terakhir, selanjutnya balik lagi ke 0 karena 8%8 = 0*/
         }
     }
 
     void listkontak() const {
         if (count==0) {
             cout << "Belum ada kontak dalam PhoneBook." << endl;
-            this_thread::sleep_for(chrono::seconds(3));
+            
             return;
         }
 
@@ -73,7 +93,7 @@ class PhoneBook{
             contacts[index].detail();
         } else {
             cout << "Indeks Kontak Invalid." << endl;
-            this_thread::sleep_for(chrono::seconds(3));
+            
         }
     }
 
@@ -83,11 +103,10 @@ class PhoneBook{
     
 };
 
-void clearScreen() {
-    for (int i = 0; i < 100; i++) {
-        cout << "\n"; // Asalnya memakai ANSI escape, tetapi ternyata tidak universal, jadinya memakai new line saja
-}
-}
+void spacing() {
+        cout << "\n"; 
+        // Asalnya memakai ANSI escape untuk clearscreen, tetapi ternyata tidak universal, jadinya memakai new line saja untuk ngerapihin
+};
 
 
 int main(){
@@ -95,7 +114,7 @@ int main(){
     int pilihan;
 
     while(true) {
-        clearScreen();
+        spacing();
         cout << "===PhoneBook Pak Bell===" << endl;
         cout << "1. ADD, tambah kontak" << endl;
         cout << "2. SEARCH, cari kontak"<< endl;
@@ -106,7 +125,7 @@ int main(){
 
         if (pilihan == 1) {
             //ADD
-            clearScreen();
+            spacing();
             string nama, tempat, alamat, kekuatan;
             cout << "Masukkan nama: ";
             getline(cin, nama); // masuk ke variabel
@@ -119,12 +138,12 @@ int main(){
 
             phonebook.ADD(nama, tempat, alamat, kekuatan);
             cout << "Kontak berhasil ditambahkan!" << endl;
-            this_thread::sleep_for(chrono::seconds(2));
+            
         } 
         
         else if (pilihan == 2) {
             //SEARCH
-            clearScreen();
+            spacing();
             phonebook.listkontak();
             if (phonebook.countNow() > 0){
                 int index;
@@ -139,16 +158,16 @@ int main(){
 
         else if (pilihan == 3){
             //EXIT
-            clearScreen();
+            spacing();
             cout << "Program keluar, semua data dihapus," << endl;
-            this_thread::sleep_for(chrono::seconds(3));
+            
             break;
         }
 
         else {
-            clearScreen();
+            spacing();
             cout << "Pilihan tidak valid! tolong coba lagi." << endl;
-            this_thread::sleep_for(chrono::seconds(3));
+            
             continue;
         }
 
